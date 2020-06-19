@@ -6,6 +6,12 @@ import PreProcessing as pp
 import Clustering as cl
 from tkinter import messagebox
 from matplotlib import pyplot as plt
+import chart_studio.plotly as py
+from urllib.request import urlopen
+import json
+import plotly.express as px
+import pandas as pd
+import plotly.graph_objects as go
 
 
 class Calculator:
@@ -98,6 +104,7 @@ class Calculator:
                     return False
                 cl.cluster(self.dataset, num_of_runs, num_of_clusters)
                 self.draw_scatter()
+                self.draw_map()
             except Exception as e:
                 print(e)
                 error = messagebox.showerror('Error', 'error occurred in Clustering', parent=parent)
@@ -112,7 +119,52 @@ class Calculator:
         plt.show()
 
     def draw_map(self):
-        pass
+        self.create_codes()
+        # print(self.dataset)
+        fig = go.Figure(data=go.Choropleth(
+            locations=self.dataset['CODE'],
+            z=self.dataset['Cluster'],
+            text=self.dataset['country'],
+            colorscale='Blues',
+            autocolorscale=False,
+            reversescale=True,
+            marker_line_color='darkgray',
+            marker_line_width=0.5,
+            colorbar_tickprefix='$',
+            colorbar_title='GDP<br>Billions US$',
+        ))
+
+        fig.update_layout(
+            title_text='2014 Global GDP',
+            geo=dict(
+                showframe=False,
+                showcoastlines=False,
+                projection_type='equirectangular'
+            ),
+            annotations=[dict(
+                x=0.55,
+                y=0.1,
+                xref='paper',
+                yref='paper',
+                text='Source: <a href="https://www.cia.gov/library/publications/the-world-factbook/fields/2195.html">\
+                    CIA World Factbook</a>',
+                showarrow=False
+            )]
+        )
+
+        fig.show()
+
+    def create_codes(self):
+        country_codes = pd.read_csv("countries_codes.csv")
+        codes = []
+        print(self.dataset.shape[0])
+        for index, row in self.dataset.iterrows():
+            print(row['country'])
+            codes.append(country_codes.loc[country_codes["Country"] == row['country'],"Alpha-3 code"].values[0])
+            print(country_codes.loc[country_codes["Country"] == row['country'],"Alpha-3 code"].values[0])
+
+        print(codes)
+        self.dataset['CODE'] = codes
 
 
 root = Tk()
