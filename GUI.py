@@ -12,6 +12,8 @@ import json
 import plotly.express as px
 import pandas as pd
 import plotly.graph_objects as go
+import numpy as np
+from PIL import Image, ImageTk
 
 
 class Calculator:
@@ -22,23 +24,30 @@ class Calculator:
         vcmd = master.register(self.validate)
         self.dataset = None
 
+        frame = Frame(master)
+        frame.grid(row=0, column=0, sticky="n")
+        self.canvas1 = Canvas(master, width=510, height=420)
+        self.canvas1.grid(row=1, column=0)
+        self.canvas2 = Canvas(master, width=510, height=420)
+        self.canvas2.grid(row=1, column=1)
+
         # num of clusters
-        self.num_of_clusters_label = Label(master, text="Number of clusters k:")
+        self.num_of_clusters_label = Label(frame, text="Number of clusters k:")
         self.entryTextCluster = StringVar()
-        self.num_of_clusters_entry = Entry(master, textvariable=self.entryTextCluster)
+        self.num_of_clusters_entry = Entry(frame, textvariable=self.entryTextCluster)
         # num of runs
-        self.number_of_runs_label = Label(master, text="Number of runs:")
+        self.number_of_runs_label = Label(frame, text="Number of runs:")
         self.entryTextRuns = StringVar()
-        self.number_of_runs_entry = Entry(master, textvariable=self.entryTextRuns)
+        self.number_of_runs_entry = Entry(frame, textvariable=self.entryTextRuns)
         # path label
         self.entryTextPath = StringVar()
-        self.path_label = Label(master, text="File Path:")
-        self.path_entry = Entry(master, textvariable=self.entryTextPath, state='disabled')
+        self.path_label = Label(frame, text="File Path:")
+        self.path_entry = Entry(frame, textvariable=self.entryTextPath, state='disabled')
 
         # buttons
-        self.browse_button = Button(master, text="Browse", command=lambda: self.update("browse"))
-        self.pre_process_button = Button(master, text="Pre-process", command=lambda: self.update("pre_process"))
-        self.cluster_button = Button(master, text="Cluster", command=lambda: self.update("cluster"), state="disabled")
+        self.browse_button = Button(frame, text="Browse", command=lambda: self.update("browse"))
+        self.pre_process_button = Button(frame, text="Pre-process", command=lambda: self.update("pre_process"))
+        self.cluster_button = Button(frame, text="Cluster", command=lambda: self.update("cluster"), state="disabled")
 
         # LAYOUT num_of_clusters
         self.num_of_clusters_label.grid(row=1, column=0, sticky=W)
@@ -60,6 +69,7 @@ class Calculator:
         self.pre_process_button.grid(row=4, column=1)
         self.cluster_button.grid(row=5, column=1)
 
+
     def validate(self, new_text):
         if not new_text:  # the field is being cleared
             return False
@@ -71,8 +81,6 @@ class Calculator:
             data = file.read()
             file.close()
             self.entryTextPath.set(file.name)
-            print
-            "I got %d bytes from this file." % len(data)
 
     def update(self, method):
         if method == "browse":
@@ -105,6 +113,17 @@ class Calculator:
                 cl.cluster(self.dataset, num_of_runs, num_of_clusters)
                 self.draw_scatter()
                 self.draw_map()
+                # images
+                img_open1 = Image.open("Countries Clusters.png")
+                img1 = ImageTk.PhotoImage(img_open1.resize((550, 400), Image.ANTIALIAS))
+                self.canvas1.create_image(250, 200, image=img1, anchor=CENTER)
+
+                img_open2 = Image.open("scatter.png")
+                img2 = ImageTk.PhotoImage(img_open2.resize((550, 400), Image.ANTIALIAS))
+                self.canvas2.create_image(250, 200, image=img2, anchor=CENTER)
+
+                self.master.mainloop()
+
             except Exception as e:
                 print(e)
                 error = messagebox.showerror('Error', 'error occurred in Clustering', parent=parent)
@@ -116,11 +135,15 @@ class Calculator:
         plt.xlabel("social_support")
         plt.ylabel("Generosity")
         plt.title("K Means Clustering")
-        plt.show()
+        plt.savefig('scatter.png')
+
+        img_open2 = Image.open("scatter.png")
+        img = img_open2.resize((700, 500), Image.ANTIALIAS)
+        img.save('scatter.png')
+
 
     def draw_map(self):
         self.create_codes()
-        # print(self.dataset)
         fig = go.Figure(data=go.Choropleth(
             locations=self.dataset['CODE'],
             z=self.dataset['Cluster'],
@@ -130,44 +153,39 @@ class Calculator:
             reversescale=True,
             marker_line_color='darkgray',
             marker_line_width=0.5,
-            colorbar_tickprefix='$',
-            colorbar_title='GDP<br>Billions US$',
+            # colorbar_tickprefix='$',
+            colorbar_title='Countries Clusters',
         ))
 
         fig.update_layout(
-            title_text='2014 Global GDP',
+            title_text='Countries Clusters',
             geo=dict(
                 showframe=False,
                 showcoastlines=False,
                 projection_type='equirectangular'
             ),
-            annotations=[dict(
-                x=0.55,
-                y=0.1,
-                xref='paper',
-                yref='paper',
-                text='Source: <a href="https://www.cia.gov/library/publications/the-world-factbook/fields/2195.html">\
-                    CIA World Factbook</a>',
-                showarrow=False
-            )]
         )
+        py.sign_in("nivgold", "CmHRBPCSQCYksweD8KNu")
+        py.image.save_as(fig, filename='Countries Clusters.png')
 
-        fig.show()
+        # img = PhotoImage("Countries Cluster.png")
+        # self.canvas.create_image(20, 20, anchor=NW, image=img)
+        # fig.show()
 
     def create_codes(self):
         country_codes = pd.read_csv("countries_codes.csv")
         codes = []
-        print(self.dataset.shape[0])
+        ignored_countries = ["North Cyprus", "Somaliland region"]
         for index, row in self.dataset.iterrows():
-            print(row['country'])
-            codes.append(country_codes.loc[country_codes["Country"] == row['country'],"Alpha-3 code"].values[0])
-            print(country_codes.loc[country_codes["Country"] == row['country'],"Alpha-3 code"].values[0])
-
-        print(codes)
+            if row['country'] in ignored_countries:
+                codes.append(" ")
+            else:
+                codes.append(
+                    country_codes.loc[country_codes["Country"] == row['country'], "Alpha-3 code"].item().split("\"")[1])
         self.dataset['CODE'] = codes
 
 
 root = Tk()
-root.geometry("500x200")
+root.geometry("1030x600")
 my_gui = Calculator(root)
 root.mainloop()
