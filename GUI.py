@@ -106,10 +106,10 @@ class Calculator:
             try:
                 num_of_clusters = int(self.num_of_clusters_entry.get())
                 num_of_runs = int(self.number_of_runs_entry.get())
-                if num_of_clusters < 0:
-                    return False
-                if num_of_runs < 0:
-                    return False
+                # if num_of_clusters < 0:
+                #     return False
+                # if num_of_runs < 0:
+                #     return False
                 cl.cluster(self.dataset, num_of_runs, num_of_clusters)
                 self.draw_scatter()
                 self.draw_map()
@@ -154,10 +154,8 @@ class Calculator:
             reversescale=True,
             marker_line_color='darkgray',
             marker_line_width=0.5,
-            # colorbar_tickprefix='$',
             colorbar_title='Countries Clusters',
         ))
-
         fig.update_layout(
             title_text='Countries Clusters',
             geo=dict(
@@ -168,10 +166,6 @@ class Calculator:
         )
         py.sign_in("nivgold", "CmHRBPCSQCYksweD8KNu")
         py.image.save_as(fig, filename='Countries Clusters.png')
-
-        # img = PhotoImage("Countries Cluster.png")
-        # self.canvas.create_image(20, 20, anchor=NW, image=img)
-        # fig.show()
 
     def create_codes(self):
         country_codes = pd.read_csv("countries_codes.csv")
