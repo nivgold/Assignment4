@@ -94,10 +94,10 @@ class Calculator:
                 path = self.path_entry.get()
                 self.dataset = pp.pre_process(path)
                 # show dialog
-                info = messagebox.showinfo('Pre-Processing', 'Preprocessing completed successfully!', parent=parent)
+                info = messagebox.showinfo('K Means Clustering', 'Preprocessing completed successfully!', parent=parent)
                 self.cluster_button['state'] = "normal"
             except Exception as e:
-                error = messagebox.showerror('Error', 'error occurred in Pre-Processing', parent=parent)
+                error = messagebox.showerror('K Means Clustering', 'error occurred in Pre-Processing', parent=parent)
 
         elif method == "cluster":
             parent = tkinter.Tk()  # Create the object
@@ -113,6 +113,8 @@ class Calculator:
                 cl.cluster(self.dataset, num_of_runs, num_of_clusters)
                 self.draw_scatter()
                 self.draw_map()
+                self.cluster_button['state'] = "disabled"
+                info = messagebox.showinfo('K Means Clustering', 'Clustering completed successfully!', parent=parent)
                 # images
                 img_open1 = Image.open("Countries Clusters.png")
                 img1 = ImageTk.PhotoImage(img_open1.resize((550, 400), Image.ANTIALIAS))
@@ -121,12 +123,11 @@ class Calculator:
                 img_open2 = Image.open("scatter.png")
                 img2 = ImageTk.PhotoImage(img_open2.resize((550, 400), Image.ANTIALIAS))
                 self.canvas2.create_image(250, 200, image=img2, anchor=CENTER)
-
                 self.master.mainloop()
 
             except Exception as e:
                 print(e)
-                error = messagebox.showerror('Error', 'error occurred in Clustering', parent=parent)
+                error = messagebox.showerror('K Means Clustering', 'error occurred in Clustering', parent=parent)
 
     def draw_scatter(self):
         x = self.dataset["Social support"]
