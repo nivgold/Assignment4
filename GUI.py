@@ -1,4 +1,4 @@
-from tkintertable import Tk, Label, Button, Entry, IntVar, END, W, E, StringVar
+from tkintertable import Label, Button, Entry
 from tkinter import filedialog
 from tkinter import *
 import tkinter
@@ -7,12 +7,8 @@ import Clustering as cl
 from tkinter import messagebox
 from matplotlib import pyplot as plt
 import chart_studio.plotly as py
-from urllib.request import urlopen
-import json
-import plotly.express as px
 import pandas as pd
 import plotly.graph_objects as go
-import numpy as np
 from PIL import Image, ImageTk
 
 

@@ -1,11 +1,5 @@
 import pandas as pd
-import numpy as np
-import matplotlib as plt
-import matplotlib.pyplot as plt
-import statistics as stats
-from tkinter import messagebox
 from sklearn import preprocessing
-from tkinter import *
 
 def pre_process(path):
     try:

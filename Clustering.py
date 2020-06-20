@@ -1,6 +1,4 @@
 from sklearn.cluster import KMeans
-import pandas as pd
-import numpy as np
 
 # do the cluster operation
 def cluster(dataset, num_of_runs, num_of_clusters):
