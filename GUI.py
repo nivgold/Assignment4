@@ -21,7 +21,7 @@ class Calculator:
     def __init__(self, master):
         self.master = master
         master.title("K Means Clustering")
-        vcmd = master.register(self.validate)
+        validate_num = master.register(self.validate)
         self.dataset = None
 
         frame = Frame(master)
@@ -34,11 +34,13 @@ class Calculator:
         # num of clusters
         self.num_of_clusters_label = Label(frame, text="Number of clusters k:")
         self.entryTextCluster = StringVar()
-        self.num_of_clusters_entry = Entry(frame, textvariable=self.entryTextCluster)
+        self.num_of_clusters_entry = Entry(frame, textvariable=self.entryTextCluster, validate="key",
+                                           validatecommand=(validate_num, '%P'))
         # num of runs
         self.number_of_runs_label = Label(frame, text="Number of runs:")
         self.entryTextRuns = StringVar()
-        self.number_of_runs_entry = Entry(frame, textvariable=self.entryTextRuns)
+        self.number_of_runs_entry = Entry(frame, textvariable=self.entryTextRuns, validate="key",
+                                          validatecommand=(validate_num, '%P'))
         # path label
         self.entryTextPath = StringVar()
         self.path_label = Label(frame, text="File Path:")
@@ -69,12 +71,20 @@ class Calculator:
         self.pre_process_button.grid(row=4, column=1)
         self.cluster_button.grid(row=5, column=1)
 
-
+    # validate the input number values
     def validate(self, new_text):
         if not new_text:  # the field is being cleared
+            self.entered_number = 0
+            return True
+        try:
+            self.entered_number = int(new_text)
+            if self.entered_number <= 0 or self.entered_number > 50:
+                return False
+            return True
+        except ValueError:
             return False
-        return True
 
+    # browse the data file path and enter it to the frame
     def browse(self):
         file = filedialog.askopenfile(parent=root, mode='rb', title='Choose a file')
         if file != None:
@@ -82,6 +92,7 @@ class Calculator:
             file.close()
             self.entryTextPath.set(file.name)
 
+    # router for all the operations in the buttons
     def update(self, method):
         if method == "browse":
             self.browse()
@@ -97,7 +108,7 @@ class Calculator:
                 info = messagebox.showinfo('K Means Clustering', 'Preprocessing completed successfully!', parent=parent)
                 self.cluster_button['state'] = "normal"
             except Exception as e:
-                error = messagebox.showerror('K Means Clustering', 'error occurred in Pre-Processing', parent=parent)
+                error = messagebox.showerror('K Means Clustering', e, parent=parent)
 
         elif method == "cluster":
             parent = tkinter.Tk()  # Create the object
@@ -106,10 +117,6 @@ class Calculator:
             try:
                 num_of_clusters = int(self.num_of_clusters_entry.get())
                 num_of_runs = int(self.number_of_runs_entry.get())
-                # if num_of_clusters < 0:
-                #     return False
-                # if num_of_runs < 0:
-                #     return False
                 cl.cluster(self.dataset, num_of_runs, num_of_clusters)
                 self.draw_scatter()
                 self.draw_map()
@@ -127,8 +134,9 @@ class Calculator:
 
             except Exception as e:
                 print(e)
-                error = messagebox.showerror('K Means Clustering', 'error occurred in Clustering', parent=parent)
+                error = messagebox.showerror('K Means Clustering', 'Please fill all the entries', parent=parent)
 
+    # draw the scatter after the clustering operation
     def draw_scatter(self):
         x = self.dataset["Social support"]
         y = self.dataset["Generosity"]
@@ -142,7 +150,7 @@ class Calculator:
         img = img_open2.resize((700, 500), Image.ANTIALIAS)
         img.save('scatter.png')
 
-
+    # draw the map after the clustering operation
     def draw_map(self):
         self.create_codes()
         fig = go.Figure(data=go.Choropleth(
@@ -167,6 +175,7 @@ class Calculator:
         py.sign_in("nivgold", "CmHRBPCSQCYksweD8KNu")
         py.image.save_as(fig, filename='Countries Clusters.png')
 
+    # add the codes of the countries doe the full name of the countries in DB
     def create_codes(self):
         country_codes = pd.read_csv("countries_codes.csv")
         codes = []

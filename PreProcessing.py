@@ -7,7 +7,6 @@ from tkinter import messagebox
 from sklearn import preprocessing
 from tkinter import *
 
-
 def pre_process(path):
     try:
         df = pd.read_excel(path)
@@ -26,5 +25,7 @@ def pre_process(path):
         df = df.drop(['year'], axis=1)
         return df
 
+    except FileNotFoundError as e:
+        raise Exception("Please enter a database path")
     except Exception as e:
-        raise e
+        raise Exception("The entered path isn't fit. Please enter new path")
