@@ -12,7 +12,7 @@ import plotly.graph_objects as go
 from PIL import Image, ImageTk
 
 
-class Calculator:
+class KMeansGUI:
 
     def __init__(self, master):
         self.master = master
@@ -201,5 +201,5 @@ class Calculator:
 
 root = Tk()
 root.geometry("1030x600")
-my_gui = Calculator(root)
+my_gui = KMeansGUI(root)
 root.mainloop()
