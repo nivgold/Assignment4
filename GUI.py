@@ -17,7 +17,8 @@ class Calculator:
     def __init__(self, master):
         self.master = master
         master.title("K Means Clustering")
-        validate_num = master.register(self.validate)
+        validate_k_num = master.register(self.validate_k_num)
+        validate_k_runs=master.register(self.validate_k_runs)
         self.dataset = None
 
         frame = Frame(master)
@@ -31,12 +32,12 @@ class Calculator:
         self.num_of_clusters_label = Label(frame, text="Number of clusters k:")
         self.entryTextCluster = StringVar()
         self.num_of_clusters_entry = Entry(frame, textvariable=self.entryTextCluster, validate="key",
-                                           validatecommand=(validate_num, '%P'))
+                                           validatecommand=(validate_k_num, '%P'))
         # num of runs
         self.number_of_runs_label = Label(frame, text="Number of runs:")
         self.entryTextRuns = StringVar()
         self.number_of_runs_entry = Entry(frame, textvariable=self.entryTextRuns, validate="key",
-                                          validatecommand=(validate_num, '%P'))
+                                          validatecommand=(validate_k_runs, '%P'))
         # path label
         self.entryTextPath = StringVar()
         self.path_label = Label(frame, text="File Path:")
@@ -67,8 +68,21 @@ class Calculator:
         self.pre_process_button.grid(row=4, column=1)
         self.cluster_button.grid(row=5, column=1)
 
-    # validate the input number values
-    def validate(self, new_text):
+    # validate the k means entered number value
+    def validate_k_num(self, new_text):
+        if not new_text:  # the field is being cleared
+            self.entered_number = 0
+            return True
+        try:
+            self.entered_number = int(new_text)
+            if self.entered_number <= 2 or self.entered_number > 50:
+                return False
+            return True
+        except ValueError:
+            return False
+
+    # validate num of runs entered number value
+    def validate_k_runs(self,new_text):
         if not new_text:  # the field is being cleared
             self.entered_number = 0
             return True
