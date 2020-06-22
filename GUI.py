@@ -1,4 +1,3 @@
-from tkintertable import Label, Button, Entry
 from tkinter import filedialog
 from tkinter import *
 import tkinter
@@ -24,24 +23,24 @@ class KMeansGUI:
         frame = Frame(master)
         frame.grid(row=0, column=0, sticky="n")
         self.canvas1 = Canvas(master, width=510, height=420)
-        self.canvas1.grid(row=1, column=0)
+        self.canvas1.grid(row=2, column=0)
         self.canvas2 = Canvas(master, width=510, height=420)
-        self.canvas2.grid(row=1, column=1)
+        self.canvas2.grid(row=2, column=1)
 
         # num of clusters
-        self.num_of_clusters_label = Label(frame, text="Number of clusters k:")
+        self.num_of_clusters_label = Label(frame, text="Number of Clusters k:")
         self.entryTextCluster = StringVar()
         self.num_of_clusters_entry = Entry(frame, textvariable=self.entryTextCluster, validate="key",
                                            validatecommand=(validate_k_num, '%P'))
         # num of runs
-        self.number_of_runs_label = Label(frame, text="Number of runs:")
+        self.number_of_runs_label = Label(frame, text="Number of Runs:")
         self.entryTextRuns = StringVar()
         self.number_of_runs_entry = Entry(frame, textvariable=self.entryTextRuns, validate="key",
                                           validatecommand=(validate_k_runs, '%P'))
         # path label
         self.entryTextPath = StringVar()
         self.path_label = Label(frame, text="File Path:")
-        self.path_entry = Entry(frame, textvariable=self.entryTextPath, state='disabled')
+        self.path_entry = Entry(frame, textvariable=self.entryTextPath, state='disabled', width=100)
 
         # buttons
         self.browse_button = Button(frame, text="Browse", command=lambda: self.update("browse"))
@@ -61,18 +60,21 @@ class KMeansGUI:
         # LAYOUT path_label
         self.path_label.grid(row=0, column=0, sticky=W + E)
         self.path_entry.grid(row=0, column=1, sticky=W + E)
-        self.path_entry.config(width=50)
+        self.path_entry.config(width=75)
 
         # LAYOUT buttons
         self.browse_button.grid(row=0, column=2)
+        self.browse_button.config(width=15, bg='orange')
         self.pre_process_button.grid(row=4, column=1)
+        self.pre_process_button.config(width=20, bg='blue')
         self.cluster_button.grid(row=5, column=1)
+        self.cluster_button.config(width=20, bg='green')
 
     # validate the k means entered number value
     def validate_k_num(self, new_text):
         if not new_text:  # the field is being cleared
             self.entered_number = 0
-            return True
+            return False
         try:
             self.entered_number = int(new_text)
             if self.entered_number <= 2 or self.entered_number > 50:
@@ -85,7 +87,7 @@ class KMeansGUI:
     def validate_k_runs(self,new_text):
         if not new_text:  # the field is being cleared
             self.entered_number = 0
-            return True
+            return False
         try:
             self.entered_number = int(new_text)
             if self.entered_number <= 0 or self.entered_number > 50:
@@ -143,7 +145,6 @@ class KMeansGUI:
                 self.master.mainloop()
 
             except Exception as e:
-                print(e)
                 error = messagebox.showerror('K Means Clustering', 'Please fill all the entries', parent=parent)
 
     # draw the scatter after the clustering operation
@@ -200,6 +201,6 @@ class KMeansGUI:
 
 
 root = Tk()
-root.geometry("1030x600")
+root.geometry("1300x600")
 my_gui = KMeansGUI(root)
 root.mainloop()
