@@ -1,4 +1,4 @@
 .idea/
 Countries Clusters.png
 scatter.png
-*__pycache__*
+__pycache__/
