@@ -74,10 +74,10 @@ class KMeansGUI:
     def validate_k_num(self, new_text):
         if not new_text:  # the field is being cleared
             self.entered_number = 0
-            return False
+            return True
         try:
             self.entered_number = int(new_text)
-            if self.entered_number <= 2 or self.entered_number > 50:
+            if self.entered_number <= 0 or self.entered_number > 50:
                 return False
             return True
         except ValueError:
@@ -87,7 +87,7 @@ class KMeansGUI:
     def validate_k_runs(self,new_text):
         if not new_text:  # the field is being cleared
             self.entered_number = 0
-            return False
+            return True
         try:
             self.entered_number = int(new_text)
             if self.entered_number <= 0 or self.entered_number > 50:
@@ -129,6 +129,10 @@ class KMeansGUI:
             try:
                 num_of_clusters = int(self.num_of_clusters_entry.get())
                 num_of_runs = int(self.number_of_runs_entry.get())
+                # check that num of clusters above 2
+                if num_of_clusters < 2:
+                    error = messagebox.showerror('K Means Clustering', 'Num of Clusters must be at least 2', parent=parent)
+                    return False
                 cl.cluster(self.dataset, num_of_runs, num_of_clusters)
                 self.draw_scatter()
                 self.draw_map()
