@@ -190,9 +190,8 @@ class KMeansGUI:
     def create_codes(self):
         country_codes = pd.read_csv("countries_codes.csv")
         codes = []
-        ignored_countries = ["North Cyprus", "Somaliland region"]
         for index, row in self.dataset.iterrows():
-            if row['country'] in ignored_countries:
+            if row['country'] not in country_codes['Country'].unique():
                 codes.append(" ")
             else:
                 codes.append(
